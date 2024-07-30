@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Sản phẩm</title>
+    <link rel="stylesheet" href="/view/index/index.css">
+</head>
+<body>
+<div class="container">
+    <h1>Quản lý Sản phẩm</h1>
+
+    <div class="form-group">
+        <label for="ten">Tên sản phẩm:</label>
+        <input type="text" id="ten" name="ten">
+    </div>
+    <button onclick="searchProducts()">Tìm kiếm</button>
+
+    <div class="actions">
+        <button onclick="window.location.href='/view/viewadd/viewadd.html'">Thêm sản phẩm</button>
+    </div>
+
+    <div class="results" id="results"></div>
+
+    <div class="pagination" id="pagination">
+        <button onclick="prevPage()">Previous</button>
+        <span id="pageNumber">1</span>
+        <button onclick="nextPage()">Next</button>
+    </div>
+</div>
+
+<script>
+    let currentPage = 0;
+
+    function fetchProducts(page) {
+        fetch(`http://localhost:8080/api/sanpham/getpage?page=${page}`)
+            .then(response => response.json())
+            .then(data => {
+                displayProducts(data.content);
+                document.getElementById('pageNumber').textContent = page + 1;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function displayProducts(products) {
+        const results = document.getElementById('results');
+        results.innerHTML = '';
+        products.forEach(product => {
+            const productDiv = document.createElement('div');
+            productDiv.className = 'product';
+            productDiv.innerHTML = `
+                    <h2>${product.ten}</h2>
+                    <p><strong>Mã:</strong> ${product.ma}</p>
+                    <p><strong>Giá bán:</strong> ${product.giaBan}</p>
+                    <p><strong>Số lượng:</strong> ${product.soLuong}</p>
+                    <p><strong>Loại sản phẩm:</strong> ${product.loaiSanPham.ten}</p>
+                    <button onclick="window.location.href='/view/viewdetail-update/viewdetail-update.html?id=${product.id}'">Sửa</button>
+                    <button onclick="deleteProduct(${product.id})">Xóa</button>
+                `;
+            results.appendChild(productDiv);
+        });
+    }
+
+    function searchProducts() {
+        const ten = document.getElementById('ten').value;
+        fetch(`http://localhost:8080/api/sanpham/locten?ten=${ten}`)
+            .then(response => response.json())
+            .then(data => {
+                displayProducts(data);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function deleteProduct(id) {
+        fetch(`http://localhost:8080/api/sanpham/delete/${id}`, { method: 'DELETE' })
+            .then(response => {
+                if (response.ok) {
+                    alert('Xóa thành công');
+                    fetchProducts(currentPage);
+                } else {
+                    alert('Xóa thất bại');
+                }
+            });
+    }
+
+    function nextPage() {
+        currentPage++;
+        fetchProducts(currentPage);
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            currentPage--;
+            fetchProducts(currentPage);
+        }
+    }
+
+    // Initial fetch to display first page of products
+    fetchProducts(currentPage);
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Sản phẩm</title>
+    <link rel="stylesheet" href="/view/viewadd/viewadd.css">
+</head>
+<body>
+<div class="container">
+    <h1>Thêm Sản phẩm</h1>
+    <div class="form-group">
+        <label for="newMa">Mã sản phẩm:</label>
+        <input type="text" id="newMa">
+    </div>
+    <div class="form-group">
+        <label for="newTen">Tên sản phẩm:</label>
+        <input type="text" id="newTen">
+    </div>
+    <div class="form-group">
+        <label for="newGiaBan">Giá bán:</label>
+        <input type="number" id="newGiaBan">
+    </div>
+    <div class="form-group">
+        <label for="newSoLuong">Số lượng:</label>
+        <input type="number" id="newSoLuong">
+    </div>
+    <div class="form-group">
+        <label for="newLoaiSanPham">Loại sản phẩm:</label>
+        <input type="text" id="newLoaiSanPham">
+    </div>
+    <button onclick="addProduct()">Thêm</button>
+</div>
+
+<script>
+    function addProduct() {
+        const ma = document.getElementById('newMa').value;
+        const ten = document.getElementById('newTen').value;
+        const giaBan = document.getElementById('newGiaBan').value;
+        const soLuong = document.getElementById('newSoLuong').value;
+        const loaiSanPham = document.getElementById('newLoaiSanPham').value;
+
+        const product = {
+            ma: ma,
+            ten: ten,
+            giaBan: giaBan,
+            soLuong: soLuong,
+            loaiSanPham: { ten: loaiSanPham }
+        };
+
+        fetch('http://localhost:8080/api/sanpham/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(product)
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert('Thêm sản phẩm thành công');
+                window.location.href = '/view/index/index.html';
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+</body>
+</html>

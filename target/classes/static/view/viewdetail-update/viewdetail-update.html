@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập nhật Sản phẩm</title>
+    <link rel="stylesheet" href="/view/viewdetail-update/viewdetail-update.css">
+</head>
+<body>
+<div class="container">
+    <h1>Cập nhật Sản phẩm</h1>
+    <div class="form-group">
+        <label for="editMa">Mã sản phẩm:</label>
+        <input type="text" id="editMa">
+    </div>
+    <div class="form-group">
+        <label for="editTen">Tên sản phẩm:</label>
+        <input type="text" id="editTen">
+    </div>
+    <div class="form-group">
+        <label for="editGiaBan">Giá bán:</label>
+        <input type="number" id="editGiaBan">
+    </div>
+    <div class="form-group">
+        <label for="editSoLuong">Số lượng:</label>
+        <input type="number" id="editSoLuong">
+    </div>
+    <div class="form-group">
+        <label for="editLoaiSanPham">Loại sản phẩm:</label>
+        <input type="text" id="editLoaiSanPham">
+    </div>
+    <button onclick="updateProduct()">Cập nhật</button>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    let editProductId = productId;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch(`http://localhost:8080/api/sanpham/detail/${productId}`)
+            .then(response => response.json())
+            .then(product => {
+                document.getElementById('editMa').value = product.ma;
+                document.getElementById('editTen').value = product.ten;
+                document.getElementById('editGiaBan').value = product.giaBan;
+                document.getElementById('editSoLuong').value = product.soLuong;
+                document.getElementById('editLoaiSanPham').value = product.loaiSanPham.ten;
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    function updateProduct() {
+        const ma = document.getElementById('editMa').value;
+        const ten = document.getElementById('editTen').value;
+        const giaBan = document.getElementById('editGiaBan').value;
+        const soLuong = document.getElementById('editSoLuong').value;
+        const loaiSanPham = document.getElementById('editLoaiSanPham').value;
+
+        const product = {
+            ma: ma,
+            ten: ten,
+            giaBan: giaBan,
+            soLuong: soLuong,
+            loaiSanPham: { ten: loaiSanPham }
+        };
+
+        fetch(`http://localhost:8080/api/sanpham/update/${editProductId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(product)
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert('Cập nhật sản phẩm thành công');
+                window.location.href = '/view/index/index.html';
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+</body>
+</html>
